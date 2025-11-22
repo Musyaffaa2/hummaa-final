@@ -114,8 +114,9 @@ class TryoutController extends Controller
             ->get();
 
         $formattedQuestions = $questions->map(function ($q, $index) {
-            $questionType = $q->questionType->type;
-            $isMultipleChoice = ($questionType === 'multiple_choice');
+            // ✅ PERBAIKAN: Tambahkan null coalescing dan strtolower
+            $questionType = $q->questionType->type ?? '';
+            $isMultipleChoice = (strtolower($questionType) === 'multiple_choice');
             
             return [
                 'id' => $q->question_id,
@@ -172,15 +173,16 @@ class TryoutController extends Controller
                 }
                 
                 $isCorrect = false;
-                $questionType = $question->questionType->type;
+                $questionType = $question->questionType->type ?? '';
                 
-                if ($questionType === 'multiple_choice') {
+                // ✅ PERBAIKAN: Gunakan strtolower untuk case insensitive
+                if (strtolower($questionType) === 'multiple_choice') {
                     $selectedOptionId = $answerData['optionId'] ?? null;
                     $correctOption = $question->options->firstWhere('is_correct', true);
                     if ($correctOption && $selectedOptionId == $correctOption->option_id) {
                         $isCorrect = true;
                     }
-                } elseif ($questionType === 'essay') {
+                } elseif (strtolower($questionType) === 'essay') {
                     $userText = $answerData['text'] ?? '';
                     if (strcasecmp(trim($userText), trim($question->correct_answer_text)) == 0) {
                         $isCorrect = true;
@@ -263,8 +265,9 @@ class TryoutController extends Controller
             ->keyBy('question_id');
 
         $formattedQuestions = $questions->map(function ($q, $index) {
-            $questionType = $q->questionType->type;
-            $isMultipleChoice = ($questionType === 'multiple_choice');
+            // ✅ PERBAIKAN: Tambahkan null coalescing dan strtolower
+            $questionType = $q->questionType->type ?? '';
+            $isMultipleChoice = (strtolower($questionType) === 'multiple_choice');
             
             return [
                 'id' => $q->question_id,
@@ -288,7 +291,7 @@ class TryoutController extends Controller
         $formattedAnswers = [];
         foreach ($userAnswers as $question_id => $answer) {
             $question = $questions->find($question_id);
-            if ($question && $question->questionType->type === 'multiple_choice') {
+            if ($question && strtolower($question->questionType->type ?? '') === 'multiple_choice') {
                 $formattedAnswers[$question_id] = [
                     'key' => $answer->selected_option_id ? chr(65 + $question->options->search(fn($opt) => $opt->option_id == $answer->selected_option_id)) : null,
                     'optionId' => $answer->selected_option_id,
@@ -328,8 +331,9 @@ class TryoutController extends Controller
         }
 
         $formattedQuestions = $tryout->questions->map(function ($q, $index) {
-            $questionType = $q->questionType->type;
-            $isMultipleChoice = ($questionType === 'multiple_choice');
+            // ✅ PERBAIKAN: Tambahkan null coalescing dan strtolower
+            $questionType = $q->questionType->type ?? '';
+            $isMultipleChoice = (strtolower($questionType) === 'multiple_choice');
             
             return [
                 'id' => $q->question_id,
